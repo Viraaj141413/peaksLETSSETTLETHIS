@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yes or No Poll</title>
+    <style>
+        body {
+            background-color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .poll-buttons {
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            border: 2px solid #000;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 24px;
+        }
+
+        .question {
+            font-size: 24px;
+        }
+
+        .question-container {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Poll Questions</h1>
+
+    <div id="questions-container"></div>
+
+    <script>
+        // Store the votes and results in localStorage
+        let votes = JSON.parse(localStorage.getItem("pollVotes")) || {};
+
+        const questions = [
+            { question: "How do you pronounce GIF?", options: ["GIF (like 'gift')", "GIF (like 'jif')"] },
+            { question: "Is the dress blue and black or white and gold?", options: ["Blue and Black", "White and Gold"] },
+            { question: "What came first, the chicken or the egg?", options: ["Chicken", "Egg"] },
+            { question: "Should a sandwich be cut diagonally or horizontally?", options: ["Diagonally", "Horizontally"] },
+            { question: "Is cereal a soup?", options: ["Yes", "No"] },
+            { question: "Toilet paper over or under?", options: ["Over", "Under"] },
+            { question: "Pepsi or Coke?", options: ["Pepsi", "Coke"] },
+            { question: "Is pineapple on pizza good?", options: ["Yes", "No"] },
+            { question: "Could Jack have fit on the door in the movie Titanic?", options: ["Yes", "No"] },
+            { question: "Are hot dogs a sandwich?", options: ["Yes", "No"] },
+            { question: "Marvel or DC?", options: ["Marvel", "DC"] },
+            { question: "Should we get rid of daylight saving?", options: ["Yes", "No"] },
+            { question: "Xbox or Playstation?", options: ["Xbox", "Playstation"] },
+            { question: "Are we living in a simulation?", options: ["Yes", "No"] },
+            { question: "Is Die Hard a Christmas movie?", options: ["Yes", "No"] },
+            { question: "Middle brownie piece, or edge piece?", options: ["Middle", "Edge"] },
+            { question: "Sock shoe sock shoe or sock sock shoe shoe?", options: ["Sock shoe sock shoe", "Sock sock shoe shoe"] },
+            { question: "iPhone or Android?", options: ["iPhone", "Android"] },
+            { question: "Does a straw have one hole or two?", options: ["One", "Two"] },
+            { question: "Smooth or chunky peanut butter?", options: ["Smooth", "Chunky"] },
+            { question: "Ronaldo or Messi?", options: ["Ronaldo", "Messi"] }
+        ];
+
+        function loadQuestions() {
+            const container = document.getElementById("questions-container");
+            container.innerHTML = ''; // Clear the container first
+
+            questions.forEach((question, index) => {
+                // Create question container
+                const questionContainer = document.createElement("div");
+                questionContainer.classList.add("question-container");
+
+                // Create question text
+                const questionTitle = document.createElement("h2");
+                questionTitle.textContent = question.question;
+                questionContainer.appendChild(questionTitle);
+
+                // Create options
+                question.options.forEach((option, i) => {
+                    const button = document.createElement("button");
+                    button.textContent = option;
+
+                    // Set button click functionality
+                    button.onclick = () => {
+                        vote(index, i);
+                    };
+
+                    // Append button to the question container
+                    questionContainer.appendChild(button);
+                });
+
+                // Show results if already voted
+                if (votes[index]) {
+                    displayResults(questionContainer, index);
+                }
+
+                container.appendChild(questionContainer);
+            });
+        }
+
+        function vote(questionIndex, optionIndex) {
+            // Prevent voting again by disabling the buttons
+            const questionContainer = document.getElementsByClassName("question-container")[questionIndex];
+            const buttons = questionContainer.getElementsByTagName("button");
+            Array.from(buttons).forEach(button => button.disabled = true);
+
+            // Store the vote in the votes object
+            if (!votes[questionIndex]) {
+                votes[questionIndex] = [0, 0]; // Initialize the vote array for this question
+            }
+            votes[questionIndex][optionIndex]++;
+
+            // Save the votes to localStorage
+            localStorage.setItem("pollVotes", JSON.stringify(votes));
+
+            // Display the results for this question
+            displayResults(questionContainer, questionIndex);
+        }
+
+        function displayResults(container, questionIndex) {
+            const totalVotes = votes[questionIndex][0] + votes[questionIndex][1];
+            const option1Percentage = ((votes[questionIndex][0] / totalVotes) * 100).toFixed(2);
+            const option2Percentage = ((votes[questionIndex][1] / totalVotes) * 100).toFixed(2);
+
+            const resultText = `
+                <div class="result">
+                    <div>${questions[questionIndex].options[0]}: ${votes[questionIndex][0]} votes (${option1Percentage}%)</div>
+                    <div>${questions[questionIndex].options[1]}: ${votes[questionIndex][1]} votes (${option2Percentage}%)</div>
+                </div>
+            `;
+            container.innerHTML += resultText; // Append the results to the container
+        }
+
+        // Load questions when the page is ready
+        loadQuestions();
+    </script>
+
+</body>
+</html>
