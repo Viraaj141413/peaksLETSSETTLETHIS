@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yes or No Poll</title>
+    <style>
+        body {
+            background-color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        .poll-buttons {
+            margin-top: 20px;
+        }
+
+        button {
+            font-size: 20px;
+            padding: 15px 30px;
+            margin: 10px;
+            cursor: pointer;
+            border: 2px solid #000;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+
+        .result {
+            margin-top: 30px;
+            font-size: 24px;
+        }
+
+        .question {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 id="question">How do you pronounce GIF?</h1>
+
+    <div class="poll-buttons">
+        <button id="option1" onclick="vote('option1')">GIF (like 'gift')</button>
+        <button id="option2" onclick="vote('option2')">GIF (like 'jif')</button>
+    </div>
+
+    <div id="result" class="result"></div>
+
+    <script>
+        let votes = { option1: 0, option2: 0 };
+
+        const questions = [
+            { question: "How do you pronounce GIF?", options: ["GIF (like 'gift')", "GIF (like 'jif')"] },
+            { question: "Is the dress blue and black or white and gold?", options: ["Blue and Black", "White and Gold"] },
+            { question: "What came first, the chicken or the egg?", options: ["Chicken", "Egg"] },
+            { question: "Should a sandwich be cut diagonally or horizontally?", options: ["Diagonally", "Horizontally"] },
+            { question: "Is cereal a soup?", options: ["Yes", "No"] },
+            { question: "Toilet paper over or under?", options: ["Over", "Under"] },
+            { question: "Pepsi or Coke?", options: ["Pepsi", "Coke"] },
+            { question: "Is pineapple on pizza good?", options: ["Yes", "No"] },
+            { question: "Could Jack have fit on the door in the movie Titanic?", options: ["Yes", "No"] },
+            { question: "Are hot dogs a sandwich?", options: ["Yes", "No"] },
+            { question: "Marvel or DC?", options: ["Marvel", "DC"] },
+            { question: "Should we get rid of daylight saving?", options: ["Yes", "No"] },
+            { question: "Xbox or Playstation?", options: ["Xbox", "Playstation"] },
+            { question: "Are we living in a simulation?", options: ["Yes", "No"] },
+            { question: "Is Die Hard a Christmas movie?", options: ["Yes", "No"] },
+            { question: "Middle brownie piece, or edge piece?", options: ["Middle", "Edge"] },
+            { question: "Sock shoe sock shoe or sock sock shoe shoe?", options: ["Sock shoe sock shoe", "Sock sock shoe shoe"] },
+            { question: "iPhone or Android?", options: ["iPhone", "Android"] },
+            { question: "Does a straw have one hole or two?", options: ["One", "Two"] },
+            { question: "Smooth or chunky peanut butter?", options: ["Smooth", "Chunky"] },
+            { question: "Ronaldo or Messi?", options: ["Ronaldo", "Messi"] }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        function loadQuestion(index) {
+            const question = questions[index];
+            document.getElementById("question").textContent = question.question;
+            document.getElementById("option1").textContent = question.options[0];
+            document.getElementById("option2").textContent = question.options[1];
+            document.getElementById("result").innerHTML = "";
+            votes = { option1: 0, option2: 0 }; // Reset votes for the new question
+        }
+
+        function vote(option) {
+            // Disable buttons after vote
+            document.getElementById("option1").disabled = true;
+            document.getElementById("option2").disabled = true;
+
+            // Update vote count
+            votes[option]++;
+
+            // Calculate results
+            const totalVotes = votes.option1 + votes.option2;
+            const option1Percentage = ((votes.option1 / totalVotes) * 100).toFixed(2);
+            const option2Percentage = ((votes.option2 / totalVotes) * 100).toFixed(2);
+
+            // Show results
+            document.getElementById("result").innerHTML = `${questions[currentQuestionIndex].options[0]}: ${option1Percentage}% | ${questions[currentQuestionIndex].options[1]}: ${option2Percentage}%`;
+
+            // Proceed to next question
+            setTimeout(() => {
+                currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                loadQuestion(currentQuestionIndex);
+            }, 2000); // Wait 2 seconds before showing next question
+        }
+
+        loadQuestion(currentQuestionIndex);
+    </script>
+
+</body>
+</html>
