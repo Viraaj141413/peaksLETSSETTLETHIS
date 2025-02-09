@@ -145,8 +145,8 @@
 
             const resultText = `
                 <div class="result">
-                    ${questions[questionIndex].options[0]}: ${option1Percentage}% 
-                    | ${questions[questionIndex].options[1]}: ${option2Percentage}%
+                    <div>${questions[questionIndex].options[0]}: ${votes[questionIndex][0]} votes (${option1Percentage}%)</div>
+                    <div>${questions[questionIndex].options[1]}: ${votes[questionIndex][1]} votes (${option2Percentage}%)</div>
                 </div>
             `;
             container.innerHTML += resultText; // Append the results to the container
