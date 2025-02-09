@@ -18,6 +18,8 @@
 
         .poll-buttons {
             margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         button {
@@ -28,6 +30,8 @@
             border: 2px solid #000;
             border-radius: 5px;
             background-color: #f0f0f0;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .result {
@@ -52,7 +56,10 @@
     <div id="result" class="result"></div>
 
     <script>
-        let votes = { option1: 0, option2: 0 };
+        let votes = {
+            option1: { yes: 0, no: 0 },
+            option2: { yes: 0, no: 0 }
+        };
 
         const questions = [
             { question: "How do you pronounce GIF?", options: ["GIF (like 'gift')", "GIF (like 'jif')"] },
@@ -80,36 +87,61 @@
 
         let currentQuestionIndex = 0;
 
+        // Load previous results from localStorage
+        const storedVotes = JSON.parse(localStorage.getItem("pollVotes"));
+        if (storedVotes) {
+            votes = storedVotes;
+        }
+
         function loadQuestion(index) {
             const question = questions[index];
             document.getElementById("question").textContent = question.question;
-            document.getElementById("option1").textContent = question.options[0];
-            document.getElementById("option2").textContent = question.options[1];
+            const pollButtons = document.querySelector(".poll-buttons");
+            pollButtons.innerHTML = ""; // Clear current buttons
+
+            question.options.forEach((option, i) => {
+                const button = document.createElement("button");
+                button.textContent = option;
+                button.onclick = function() {
+                    vote(`option${i + 1}`);
+                };
+                pollButtons.appendChild(button);
+            });
+
             document.getElementById("result").innerHTML = "";
-            votes = { option1: 0, option2: 0 }; // Reset votes for the new question
+
+            // If this question has been answered, show the result
+            if (votes[`option${currentQuestionIndex + 1}`]) {
+                displayResults();
+            }
         }
 
         function vote(option) {
             // Disable buttons after vote
-            document.getElementById("option1").disabled = true;
-            document.getElementById("option2").disabled = true;
+            const buttons = document.querySelectorAll("button");
+            buttons.forEach(button => button.disabled = true);
 
             // Update vote count
             votes[option]++;
 
-            // Calculate results
-            const totalVotes = votes.option1 + votes.option2;
-            const option1Percentage = ((votes.option1 / totalVotes) * 100).toFixed(2);
-            const option2Percentage = ((votes.option2 / totalVotes) * 100).toFixed(2);
+            // Save results in localStorage
+            localStorage.setItem("pollVotes", JSON.stringify(votes));
 
             // Show results
-            document.getElementById("result").innerHTML = `${questions[currentQuestionIndex].options[0]}: ${option1Percentage}% | ${questions[currentQuestionIndex].options[1]}: ${option2Percentage}%`;
+            displayResults();
 
-            // Proceed to next question
+            // Proceed to next question after a delay
             setTimeout(() => {
                 currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
                 loadQuestion(currentQuestionIndex);
             }, 2000); // Wait 2 seconds before showing next question
+        }
+
+        function displayResults() {
+            const totalVotes = Object.values(votes).reduce((sum, vote) => sum + vote, 0);
+            const option1Percentage = ((votes.option1 / totalVotes) * 100).toFixed(2);
+            const option2Percentage = ((votes.option2 / totalVotes) * 100).toFixed(2);
+            document.getElementById("result").innerHTML = `${questions[currentQuestionIndex].options[0]}: ${option1Percentage}% | ${questions[currentQuestionIndex].options[1]}: ${option2Percentage}%`;
         }
 
         loadQuestion(currentQuestionIndex);
